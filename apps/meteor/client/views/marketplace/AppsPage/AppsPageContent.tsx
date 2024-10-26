@@ -21,14 +21,12 @@ import MarketplaceHeader from '../components/MarketplaceHeader';
 import type { RadioDropDownGroup } from '../definitions/RadioDropDownDefinitions';
 import { useCategories } from '../hooks/useCategories';
 import { useFilteredApps } from '../hooks/useFilteredApps';
-import type { appsDataType } from '../hooks/useFilteredApps';
+import type { AppsContext } from '../hooks/useFilteredApps';
 import { useRadioToggle } from '../hooks/useRadioToggle';
-
-type AppsContext = 'explore' | 'installed' | 'premium' | 'private' | 'requested';
 
 const AppsPageContent = (): ReactElement => {
 	const { t } = useTranslation();
-	const { marketplaceApps, installedApps, privateApps, reload } = useAppsResult();
+	const { apps } = useAppsResult();
 	const [text, setText] = useDebouncedState('', 500);
 	const { current, itemsPerPage, setItemsPerPage: onSetItemsPerPage, setCurrent: onSetCurrent, ...paginationProps } = usePagination();
 
@@ -93,19 +91,6 @@ const AppsPageContent = (): ReactElement => {
 
 	const sortFilterOnSelected = useRadioToggle(setSortFilterStructure);
 
-	const getAppsData = useCallback((): appsDataType => {
-		switch (context) {
-			case 'premium':
-			case 'explore':
-			case 'requested':
-				return marketplaceApps;
-			case 'private':
-				return privateApps;
-			default:
-				return installedApps;
-		}
-	}, [context, marketplaceApps, installedApps, privateApps]);
-
 	const findSort = () => {
 		const possibleSort = sortFilterStructure.items.find(({ checked }) => checked);
 
@@ -126,7 +111,7 @@ const AppsPageContent = (): ReactElement => {
 
 	const [categories, selectedCategories, categoryTagList, onSelected] = useCategories();
 	const appsResult = useFilteredApps({
-		appsData: getAppsData(),
+		appsData: apps,
 		text,
 		current,
 		itemsPerPage,
@@ -256,7 +241,7 @@ const AppsPageContent = (): ReactElement => {
 				/>
 			)}
 			{getEmptyState()}
-			{appsResult.phase === AsyncStatePhase.REJECTED && !unsupportedVersion && <AppsPageConnectionError onButtonClick={reload} />}
+			{appsResult.phase === AsyncStatePhase.REJECTED && !unsupportedVersion && <AppsPageConnectionError />}
 		</>
 	);
 };
