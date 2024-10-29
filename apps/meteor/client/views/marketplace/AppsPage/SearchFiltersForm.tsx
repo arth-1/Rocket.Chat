@@ -140,7 +140,7 @@ const SearchFiltersForm = () => {
 					? [
 							{ id: 'urf', label: t('Unread_Requested_First'), checked: sortingMethodField.value === 'urf' },
 							{ id: 'url', label: t('Unread_Requested_Last'), checked: sortingMethodField.value === 'url' },
-					  ]
+						]
 					: []),
 				{ id: 'az', label: 'A-Z', checked: sortingMethodField.value === 'az' },
 				{ id: 'za', label: 'Z-A', checked: sortingMethodField.value === 'za' },
