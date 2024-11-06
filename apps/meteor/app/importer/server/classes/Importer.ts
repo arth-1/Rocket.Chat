@@ -14,7 +14,7 @@ import AdmZip from 'adm-zip';
 import type { MatchKeysAndValues, MongoServerError } from 'mongodb';
 
 import { Selection, SelectionChannel, SelectionUser } from '..';
-import { notifyOnSettingChangedById } from '../../../lib/server/lib/notifyListener';
+import { notifyOnSettingChanged, notifyOnSettingChangedById } from '../../../lib/server/lib/notifyListener';
 import { t } from '../../../utils/lib/i18n';
 import { ProgressStep, ImportPreparingStartedStates } from '../../lib/ImporterProgressStep';
 import type { ImporterInfo } from '../definitions/ImporterInfo';
@@ -183,6 +183,13 @@ export class Importer {
 			}
 		};
 
+		const afterContactsBatchFn = async (successCount: number) => {
+			const { value } = await Settings.incrementValueById('Contacts_Importer_Count', successCount, { returnDocument: 'after' });
+			if (value) {
+				void notifyOnSettingChanged(value);
+			}
+		};
+
 		const onErrorFn = async () => {
 			await this.addCountCompleted(1);
 		};
@@ -197,7 +204,7 @@ export class Importer {
 				await this.converter.convertUsers({ beforeImportFn, afterImportFn, onErrorFn, afterBatchFn });
 
 				await this.updateProgress(ProgressStep.IMPORTING_CONTACTS);
-				await this.converter.convertContacts({ beforeImportFn, afterImportFn, onErrorFn });
+				await this.converter.convertContacts({ beforeImportFn, afterImportFn, onErrorFn, afterBatchFn: afterContactsBatchFn });
 
 				await this.updateProgress(ProgressStep.IMPORTING_CHANNELS);
 				await this.converter.convertChannels(startedByUserId, { beforeImportFn, afterImportFn, onErrorFn });

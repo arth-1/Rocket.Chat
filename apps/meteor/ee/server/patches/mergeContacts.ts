@@ -1,7 +1,8 @@
 import type { ILivechatContact, ILivechatContactChannel } from '@rocket.chat/core-typings';
 import { License } from '@rocket.chat/license';
-import { LivechatContacts, LivechatRooms } from '@rocket.chat/models';
+import { LivechatContacts, LivechatRooms, Settings } from '@rocket.chat/models';
 
+import { notifyOnSettingChanged } from '../../../app/lib/server/lib/notifyListener';
 import { ContactMerger } from '../../../app/livechat/server/lib/contacts/ContactMerger';
 import { mergeContacts } from '../../../app/livechat/server/lib/contacts/mergeContacts';
 import { logger } from '../../app/livechat-enterprise/server/lib/logger';
@@ -29,6 +30,11 @@ export const runMergeContacts = async (_next: any, contactId: string, visitorId:
 
 	const similarContactIds = similarContacts.map((c) => c._id);
 	const { deletedCount } = await LivechatContacts.deleteMany({ _id: { $in: similarContactIds } });
+
+	const { value } = await Settings.incrementValueById('Merged_Contacts_Count', similarContacts.length, { returnDocument: 'after' });
+	if (value) {
+		void notifyOnSettingChanged(value);
+	}
 	logger.info(
 		`${deletedCount} contacts (ids: ${JSON.stringify(similarContactIds)}) have been deleted and merged with contact with id ${
 			originalContact._id

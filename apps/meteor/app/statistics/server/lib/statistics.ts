@@ -39,6 +39,7 @@ import { settings } from '../../../settings/server';
 import { Info } from '../../../utils/rocketchat.info';
 import { getMongoInfo } from '../../../utils/server/functions/getMongoInfo';
 import { getAppsStatistics } from './getAppsStatistics';
+import { getContactVerificationStatistics } from './getContactVerificationStatistics';
 import { getStatistics as getEnterpriseStatistics } from './getEEStatistics';
 import { getImporterStatistics } from './getImporterStatistics';
 import { getServicesStatistics } from './getServicesStatistics';
@@ -477,6 +478,7 @@ export const statistics = {
 		statistics.services = await getServicesStatistics();
 		statistics.importer = getImporterStatistics();
 		statistics.videoConf = await VideoConf.getStatistics();
+		statistics.contactVerification = await getContactVerificationStatistics();
 
 		// If getSettingsStatistics() returns an error, save as empty object.
 		statsPms.push(

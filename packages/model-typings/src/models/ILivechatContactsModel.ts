@@ -1,5 +1,5 @@
 import type { AtLeast, ILivechatContact, ILivechatContactChannel, ILivechatVisitor } from '@rocket.chat/core-typings';
-import type { Document, FindCursor, FindOptions, UpdateResult } from 'mongodb';
+import type { AggregationCursor, Document, FindCursor, FindOptions, UpdateResult } from 'mongodb';
 
 import type { FindPaginated, IBaseModel, InsertionModel } from './IBaseModel';
 
@@ -31,4 +31,5 @@ export interface ILivechatContactsModel extends IBaseModel<ILivechatContact> {
 		originalContactId: string,
 		options?: FindOptions<ILivechatContact>,
 	): Promise<ILivechatContact[]>;
+	findAverageAmountOfChannels(): AggregationCursor<{ avgChannelsPerContact: number }>;
 }
