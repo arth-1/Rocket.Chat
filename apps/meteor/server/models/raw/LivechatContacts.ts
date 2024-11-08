@@ -60,6 +60,11 @@ export class LivechatContactsRaw extends BaseRaw<ILivechatContact> implements IL
 				unique: false,
 			},
 			{
+				key: { 'channels.verified': 1 },
+				partialFilterExpression: { 'channels.verified': { $exists: true } },
+				unique: false,
+			},
+			{
 				key: { unknown: 1 },
 				unique: false,
 			},
@@ -249,7 +254,7 @@ export class LivechatContactsRaw extends BaseRaw<ILivechatContact> implements IL
 	}
 
 	countVerified(): Promise<number> {
-		return this.countDocuments({ unknown: false });
+		return this.countDocuments({ 'channels.verified': true });
 	}
 
 	countContactsWithoutChannels(): Promise<number> {
