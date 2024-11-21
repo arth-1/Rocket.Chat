@@ -7,4 +7,3 @@ import './permalinkStar';
 import './pinMessage';
 import './starMessage';
 import './unpinMessage';
-import './unstarMessage';
